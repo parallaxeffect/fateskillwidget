@@ -1,0 +1,135 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+#used {
+  background-color: gray;
+  color: white;
+}
+
+.container {
+  height: 1.5em;
+  width: 5em;
+  background-color: powderblue;
+  color: black;
+  padding: 2px;
+  margin: 2px;
+}
+
+.skill {
+  background-color: #EEE;
+  height: 1.3em;
+  padding: 2px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.skill {
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+
+ /* (Optional) Apply a "closed-hand" cursor during drag operation. */
+.skill:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+}
+
+</style>
+</head>
+<body>
+<div class='row'>
+<div id="unused" ondragover="allowdrop(event)"></div>
+<div id="used"></div>
+<div>
+<script>
+
+function container() {
+  return $("<div class='container' ondrop='drop(event)' ondragover='allowdrop(event)'></div>");
+}
+
+$.each(skills(), function (idx, skill) {
+  var box = $("<div class='skill' draggable='true' ondragstart='drag(event)' />").text(skill).attr("id", skill);
+  var cont = container().attr('id', 'unused'+skill).addClass('unused').append(box);
+  $("#unused").append(cont)
+});
+
+$.each([6, 5, 4, 3, 2, 1], function (idx, level) {
+  var row = $("<div class='row'/>");
+  var label = $("<div />").text('+' + level);
+  row.append(label);
+  $.each([1, 2, 3, 4, 5], function() {
+    row.append(container());
+  });
+  $("#used").append(row);
+
+});
+
+function drag(ev) {
+  ev.dataTransfer.setData("skill", ev.target.id);
+}
+
+function allowdrop(ev) {
+  ev.preventDefault();
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  var skill = ev.dataTransfer.getData("skill");
+  var src =  $('#' + skill);
+  var target = $(ev.target).closest(".container");
+  var unused = $('#unused'+skill);
+  $.each(target.children(), function (idx, child) {
+    //console.log(child);
+    sendhome($(child));
+    //childskill = $(child).attr('id');
+    //var home = $('#unused'+childskill);
+    //home.append( child);
+  })
+  if (target.hasClass('unused')){
+    sendhome(src);
+  }
+  else {
+    target.append(src);
+  }
+}
+
+function sendhome(box) {
+  var skill = box.attr('id');
+  var home = $('#unused'+skill);
+  home.append(box);
+}
+
+function skills() {
+return [
+  "Athletics",
+  "Burglary",
+  "Contacts",
+  "Crafts",
+  "Deceive",
+  "Drive",
+  "Empathy",
+  "Fight",
+  "Investigate",
+  "Lore",
+  "Notice",
+  "Physique",
+  "Provoke",
+  "Rapport",
+  "Resources",
+  "Shoot",
+  "Stealth",
+  "Will"
+];
+}
+
+console.log("done");
+</script>
+</body>
+</html>
